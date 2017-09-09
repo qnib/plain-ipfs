@@ -1,5 +1,8 @@
 #!/bin/bash
+GATEWAY_PORT=${GATEWAY_PORT:-8080}
+API_PORT=${API_PORT:-5001}
 
+MY_IP=$(ip route |awk '/eth0/{print $NF}')
 MY_IP=$(ip route |tail -n1 |awk '{print $NF}')
 IPFS_DATA=${IPFS_DATA-/data/ipfs/}
 cd ${IPFS_DATA}

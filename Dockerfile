@@ -16,4 +16,5 @@ RUN chmod +x /usr/local/bin/ipfs
 RUN apt-get install -yqq iproute2
 VOLUME ["/data/ipfs"]
 COPY opt/qnib/entry/*.sh /opt/qnib/entry/
-CMD ["ipfs", "daemon", "--routing", "dht"]
+COPY opt/qnib/ipfs/bin/start.sh /opt/qnib/ipfs/bin/
+CMD ["/opt/qnib/ipfs/bin/start.sh"]

@@ -1,11 +1,33 @@
 # plain-ipfs
 Plain image holding go-ipfs
 
+## Goal
 
-## Not yet ready
+This image should be able to start an isolated IPFS cluster or a cluster hooked to the interstellar filesystem.
 
+### Global
+By default the daemon has some seed-nodes configured, to which it will connect and be part of a global IPFS cluster.
+
+### Local
+The motivation for this image is to run an IPFS cluster in an isolated DC to use IPFS as a docker volume backend or just as a distributed filesystem for local use, without sharing all blocks with the world.
+
+## Work In Progress
+
+The `docker-compose.yml` provides a deployable stack, even though it's not yet working as intended.
+
+- [] create an isolated IPFS cluster
+- [] connect to the world using a NATed service (without exposing the external IP of the docker-host).
+
+### Run it
+
+##### Global mode
+
+When `IPFS_OFFLINE_MODE` is set to `!=true`, the default bootstrap servers are used.
 ```bash
-$ docker run -ti --rm --network host qnib/plain-ipfs
+$ docker stack deploy -c docker-compose.yml ipfs
+Creating network ipfs_default
+Creating service ipfs_daemon
+$ docker logs -f $(docker ps -ql)
 [II] qnib/init-plain script v0.4.28
 > execute entrypoint '/opt/entry/00-logging.sh'
 > execute entrypoint '/opt/entry/10-docker-secrets.env'
@@ -14,7 +36,7 @@ $ docker run -ti --rm --network host qnib/plain-ipfs
 > execute entrypoint '/opt/qnib/entry/10-ipfs-bootstrap.sh'
 initializing IPFS node at /root/.ipfs
 generating 2048-bit RSA keypair...done
-peer identity: QmV3b6UDp5MrBywQKeKpR3WKH1UKJe3F62CEutsERHw6Xv
+peer identity: QmQtCq35te4jGGEQkiQaNXAPkaJobJughqnUpaiMFTS3JU
 to get started, enter:
 
 	ipfs cat /ipfs/QmS4ustL54uo8FzR9455qaxZwuMiUhyvMcX9Ba8nUH4uVv/readme
@@ -22,26 +44,31 @@ to get started, enter:
 > execute entrypoint '/opt/qnib/entry/11-ipfs-config.sh'
 > execute CMD 'ipfs daemon --routing dht'
 Initializing daemon...
+Swarm listening on /ip4/10.0.0.2/tcp/4001
+Swarm listening on /ip4/10.0.0.3/tcp/4001
+Swarm listening on /ip4/10.255.0.3/tcp/4001
+Swarm listening on /ip4/10.255.0.4/tcp/4001
 Swarm listening on /ip4/127.0.0.1/tcp/4001
-Swarm listening on /ip4/172.17.0.1/tcp/4001
-Swarm listening on /ip4/172.18.0.1/tcp/4001
-Swarm listening on /ip4/172.19.0.1/tcp/4001
-Swarm listening on /ip4/192.168.65.2/tcp/4001
-Swarm listening on /ip6/::1/tcp/4001
-Swarm listening on /p2p-circuit/ipfs/QmV3b6UDp5MrBywQKeKpR3WKH1UKJe3F62CEutsERHw6Xv
+Swarm listening on /ip4/172.18.0.3/tcp/4001
+Swarm listening on /p2p-circuit/ipfs/QmQtCq35te4jGGEQkiQaNXAPkaJobJughqnUpaiMFTS3JU
+Swarm announcing /ip4/10.0.0.2/tcp/4001
+Swarm announcing /ip4/10.0.0.3/tcp/4001
+Swarm announcing /ip4/10.255.0.3/tcp/4001
+Swarm announcing /ip4/10.255.0.4/tcp/4001
 Swarm announcing /ip4/127.0.0.1/tcp/4001
-Swarm announcing /ip4/172.17.0.1/tcp/4001
-Swarm announcing /ip4/172.18.0.1/tcp/4001
-Swarm announcing /ip4/172.19.0.1/tcp/4001
-Swarm announcing /ip4/192.168.65.2/tcp/4001
-Swarm announcing /ip6/::1/tcp/4001
-Error: serveHTTPApi: invalid API address: "/ip4/204/tcp/" (err: failed to parse ip4: 204 failed to parse ip4 addr: 204)
+Swarm announcing /ip4/172.18.0.3/tcp/4001
+API server listening on /ip4/0.0.0.0/tcp/5001
+Gateway (readonly) server listening on /ip4/0.0.0.0/tcp/8080
+Daemon is ready
 ```
+After some seconds the webui can be reached via [http://localhost:5001/webui/](http://localhost:5001/webui/).
 
-Same with NAT-ed network... :(
+#### Offline mode
+
+In case `IPFS_OFFLINE_MODE==true`, the daemon starts in offline mode.
 
 ```bash
-$ docker run -ti --rm -p 4001:4001 -p 5001:5001 -p 8080:8080 qnib/plain-ipfs
+$ docker logs -f $(docker ps -ql)
 [II] qnib/init-plain script v0.4.28
 > execute entrypoint '/opt/entry/00-logging.sh'
 > execute entrypoint '/opt/entry/10-docker-secrets.env'
@@ -50,18 +77,17 @@ $ docker run -ti --rm -p 4001:4001 -p 5001:5001 -p 8080:8080 qnib/plain-ipfs
 > execute entrypoint '/opt/qnib/entry/10-ipfs-bootstrap.sh'
 initializing IPFS node at /root/.ipfs
 generating 2048-bit RSA keypair...done
-peer identity: QmUnrmy9fEghDBwzfqb5XkXspfbcZs3CmX6YNzbCFk3hir
+peer identity: QmRdxd3WvEDmNFgf9SNuRtaUdgExqjFG4Q5ZUQnJRo4JyJ
 to get started, enter:
 
 	ipfs cat /ipfs/QmS4ustL54uo8FzR9455qaxZwuMiUhyvMcX9Ba8nUH4uVv/readme
 
 > execute entrypoint '/opt/qnib/entry/11-ipfs-config.sh'
-> execute CMD 'ipfs daemon --routing dht'
+> execute CMD '/opt/qnib/ipfs/bin/start.sh'
 Initializing daemon...
-Swarm listening on /ip4/127.0.0.1/tcp/4001
-Swarm listening on /ip4/172.17.0.2/tcp/4001
-Swarm listening on /p2p-circuit/ipfs/QmUnrmy9fEghDBwzfqb5XkXspfbcZs3CmX6YNzbCFk3hir
-Swarm announcing /ip4/127.0.0.1/tcp/4001
-Swarm announcing /ip4/172.17.0.2/tcp/4001
-Error: serveHTTPApi: invalid API address: "/ip4/172.17.0.2/tcp/" (err: protocol requires address, none given: tcp)
+Swarm not listening, running in offline mode.
+API server listening on /ip4/0.0.0.0/tcp/5001
+Gateway (readonly) server listening on /ip4/0.0.0.0/tcp/8080
+Daemon is ready
 ```
+WHen started this way, the webui [http://localhost:5001/webui/](http://localhost:5001/webui/) is not available. :?
