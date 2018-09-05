@@ -4,7 +4,7 @@ ARG DOCKER_IMG_HASH=""
 FROM ${DOCKER_REGISTRY}/qnib/uplain-init${DOCKER_IMG_TAG}${DOCKER_IMG_HASH}
 
 ENV ENTRYPOINTS_DIR=/opt/qnib/entry/
-ARG IPFS_VER=v0.4.10
+ARG IPFS_VER=v0.4.17
 LABEL org.qnib.ipfs.version=${IPFS_VER}
 
 RUN apt-get update \
