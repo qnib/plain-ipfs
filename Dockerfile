@@ -10,9 +10,9 @@ RUN apt-get update \
 RUN mkdir -p /usr/local/bin/
 RUN wget -qO /usr/local/bin/go-github https://github.com/qnib/go-github/releases/download/0.3.0/go-github_0.3.0_Linux
 RUN chmod +x /usr/local/bin/go-github
-RUN echo "# ipfs: $(/usr/local/bin/go-github rLatestUrl --ghorg qnib --ghrepo go-ipfs --regex ipfs --limit 1)"
-RUN wget -qO /usr/local/bin/ipfs "$(/usr/local/bin/go-github rLatestUrl --ghorg qnib --ghrepo go-ipfs --regex ipfs --limit 1)"
-RUN chmod +x /usr/local/bin/ipfs
+RUN echo "# ipfs: $(/usr/local/bin/go-github rLatestUrl --ghorg ipfs --ghrepo go-ipfs --regex linux-amd64.tar.gz --limit 1)"
+RUN wget -qO- "$(/usr/local/bin/go-github rLatestUrl --ghorg ipfs --ghrepo go-ipfs --regex linux-amd64.tar.gz --limit 1)" |tar xfz - -C /usr/local/ \
+ && mv /usr/local/go-ipfs/ipfs /usr/local/bin/
 RUN apt-get install -yqq iproute2
 VOLUME ["/data/ipfs"]
 COPY opt/qnib/entry/*.sh /opt/qnib/entry/
