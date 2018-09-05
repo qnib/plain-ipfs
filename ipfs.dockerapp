@@ -1,5 +1,5 @@
 ---
-version: 0.4.10-2
+version: 0.4.17
 name: ipfs
 description: "IPFS stack to run an InterPlanetary File System"
 maintainers:
@@ -12,7 +12,7 @@ targets:
 version: '3.6'
 services:
   daemon:
-    image: qnib/plain-ipfs:v0.4.10-2
+    image: qnib/plain-ipfs:v0.4.17
     ports:
         - "5001:5001"
         - "4001:4001"
